@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel = "stylesheet" type = "text/css" href = "style.css" />
+        <title>SeatSurfer</title>
+    </head>
+    <body>
+        <div class="floor-container">
+            <label>Select the floor:</label>
+            <select id="storey" title="Select the floor and date">
+                <option value="1">Floor 4: 31.07.2024</option>
+                <option value="2">Floor 4: 01.08.2024</option>
+                <option value="3">Floor 6: 31.07.2024</option>
+                <option value="4">Floor 6: 01.08.2024</option>
+            </select>
+        </div>
+
+        <ul class="showcase">
+            <li>
+                <div class="seat"></div>
+                <small>Available</small>
+            </li>
+            <li>
+                <div class="seat selected"></div>
+                <small>Selected</small>
+            </li>
+            <li>
+                <div class="seat occupied"></div>
+                <small>Occupied</small>
+            </li>
+        </ul>
+
+        <div class="container">
+            <div class="walls"></div>
+            <div class="seating-area"></div>
+        </div>
+
+        <p class="text">You selected <span id="count">0</span> seats. <button class="select">SELECT</button></p>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <h2>Book seats</h2>
+                <form id="seatForm">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" required />
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required />
+                </form>
+                <p id="seat-message"></p>
+                <div class="modal-buttons">
+                    <button class="close-modal">Close</button>
+                    <button class="confirm-seat">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
