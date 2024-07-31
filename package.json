@@ -1,0 +1,23 @@
+{
+  "name": "seatsuerferui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "browser-sync start --server --files '**/*'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProdanRaduMatei/SeatSuerferUI.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ProdanRaduMatei/SeatSuerferUI/issues"
+  },
+  "homepage": "https://github.com/ProdanRaduMatei/SeatSuerferUI#readme",
+  "devDependencies": {
+    "browser-sync": "^3.0.2"
+  }
+}
