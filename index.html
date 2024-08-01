@@ -10,11 +10,11 @@
     <body>
         <div class="floor-container">
             <label>Select the floor:</label>
-            <select id="floor" title="Select the floor and date">
-                <option value="1">Floor 4: 31.07.2024</option>
-                <option value="2">Floor 4: 01.08.2024</option>
-                <option value="3">Floor 6: 31.07.2024</option>
-                <option value="4">Floor 6: 01.08.2024</option>
+            <select id="floor" title="Select the floor and date" onchange="loadSeatingArrangement()">
+                <option value="etaj4/day1.json">Floor 4: 31.07.2024</option>
+                <option value="etaj4/day2.json">Floor 4: 01.08.2024</option>
+                <option value="etaj6/day1.json">Floor 6: 31.07.2024</option>
+                <option value="etaj6/day2.json">Floor 6: 01.08.2024</option>
             </select>
         </div>
 
@@ -34,7 +34,6 @@
         </ul>
 
         <div class="container">
-            <div class="walls"></div>
             <div class="seating-area"></div>
         </div>
 

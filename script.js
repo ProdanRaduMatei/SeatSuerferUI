@@ -153,3 +153,62 @@ const floorSelect = document.getElementById('floor');
 floorSelect.addEventListener('change', handleStoreySection);
 
 handleStoreySection();
+
+async function loadSeatingArrangement() {
+    const select = document.getElementById('floor');
+    const filePath = select.value;
+    
+    try {
+        const response = await fetch(filePath);
+        const data = await response.json();
+        displaySeatingArrangement(data.arrangement);
+    } catch (error) {
+        console.error('Error fetching the JSON data:', error);
+    }
+}
+
+function displaySeatingArrangement(arrangement) {
+    const seatingArea = document.querySelector('.seating-area');
+    seatingArea.innerHTML = ''; // Clear previous seating arrangement
+
+    arrangement.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('row');
+
+        row.forEach(seat => {
+            const seatDiv = document.createElement('div');
+            if (seat === 1)
+                seatDiv.classList.add('seat', 'rotated-up');
+            else if (seat === 11)
+                seatDiv.classList.add('seat', 'rotated-left');
+            else if (seat === 12)
+                seatDiv.classList.add('seat', 'rotated-right');
+            else if (seat === 13)
+                seatDiv.classList.add('seat');
+            else if (seat === 2)
+                seatDiv.classList.add('seat', 'occupied');
+            else if (seat === 21)
+                seatDiv.classList.add('seat', 'occupied', 'rotated-up');
+            else if (seat === 22)
+                seatDiv.classList.add('seat', 'occupied', 'rotated-right');
+            else if (seat === 23)
+                seatDiv.classList.add('seat', 'occupied', 'rotated-left');
+            else if (seat === 0)
+                seatDiv.classList.add('seat', 'corridor');
+
+            // Add click event listener to toggle the selected class
+            seatDiv.addEventListener('click', () => {
+                if (!seatDiv.classList.contains('occupied') && !seatDiv.classList.contains('corridor')) {
+                    seatDiv.classList.toggle('selected');
+                }
+            });
+
+            rowDiv.appendChild(seatDiv);
+        });
+
+        seatingArea.appendChild(rowDiv);
+    });
+}
+
+// Load initial seating arrangement on page load
+document.addEventListener('DOMContentLoaded', loadSeatingArrangement);
