@@ -2,6 +2,12 @@ let bookingMessageDisplayed = false;
 let selectedSeatCount = 0;
 const container = document.querySelector('.container');
 
+const generateBookingMessage = () => {
+    const seatCounter = document.getElementById('seat-counter').textContent;
+    const seatMessage = document.getElementById('seat-message');
+    seatMessage.textContent = `You have selected ${seatCounter} seats.`;
+};
+
 const selectButton = document.querySelector('.select');
 selectButton.addEventListener('click', () => {
     generateBookingMessage();
@@ -9,18 +15,16 @@ selectButton.addEventListener('click', () => {
 });
 
 const openModal = () => {
-    const modal = document.querySelector('.modal');
-    const closeModalButton = document.getElementById('close-modal');
+    const modal = document.getElementById('modal');
+    const closeModalButton = document.querySelector('.close-modal');
 
     modal.style.display = 'block';
 
-    closeModalButton.addEventListener('click', () => {
-        closeModal();
-    });
+    closeModalButton.addEventListener('click', closeModal);
 };
 
 const closeModal = () => {
-    const modal = document.querySelector('.modal');
+    const modal = document.getElementById('modal');
     modal.style.display = 'none';
 };
 
