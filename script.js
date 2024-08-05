@@ -137,10 +137,11 @@ function getSeatClasses(seat) {
     return classes;
 };
 
-function createSeatElement(seat) {
+function createSeatElement(seat, seatIndex) {
     const seatDiv = document.createElement('div');
     const classes = getSeatClasses(seat);
     seatDiv.classList.add(...classes);
+    seatDiv.setAttribute('data-index', seatIndex);
 
     if (!seatDiv.classList.contains('occupied') && !seatDiv.classList.contains('corridor')) {
         seatDiv.addEventListener('click', () => {
@@ -151,24 +152,23 @@ function createSeatElement(seat) {
     }
 
     return seatDiv;
-};
+}
 
 function displaySeatingArrangement(arrangement) {
     const seatingArea = document.querySelector('.seating-area');
-    seatingArea.innerHTML = ''; // Clear previous seating arrangement
+    seatingArea.innerHTML = '';
 
-    arrangement.forEach(row => { //to do row/seat index
+    arrangement.forEach((row, rowIndex) => {
         const rowDiv = document.createElement('div');
         rowDiv.classList.add('row');
 
-        row.forEach(seat => {
-            const seatDiv = createSeatElement(seat);
+        row.forEach((seat, seatIndex) => {
+            const seatDiv = createSeatElement(seat, seatIndex);
             rowDiv.appendChild(seatDiv);
         });
 
         seatingArea.appendChild(rowDiv);
     });
-};
+}
 
-// Load initial seating arrangement on page load
 document.addEventListener('DOMContentLoaded', loadSeatingArrangement);
