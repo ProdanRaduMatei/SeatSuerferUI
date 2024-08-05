@@ -107,28 +107,28 @@ function updateSeatCounter() {
 function getSeatClasses(seat) {
     const classes = ['seat'];
     switch (seat) {
-        case 1:
-            classes.push('rotated-up');
-            break;
         case 11:
-            classes.push('rotated-left');
             break;
         case 12:
-            classes.push('rotated-right');
+            classes.push('facing-inwards-right');
             break;
         case 13:
+            classes.push('upside-down');
             break;
-        case 2:
-            classes.push('occupied');
+        case 14:
+            classes.push('facing-inwards-left');
             break;
         case 21:
-            classes.push('occupied', 'rotated-up');
+            classes.push('occupied');
             break;
         case 22:
-            classes.push('occupied', 'rotated-right');
+            classes.push('occupied', 'facing-inwards-right');
             break;
         case 23:
-            classes.push('occupied', 'rotated-left');
+            classes.push('occupied', 'upside-down');
+            break;
+        case 24:
+            classes.push('occupied', 'facing-inwards-left');
             break;
         case 0:
             classes.push('corridor');
@@ -157,7 +157,7 @@ function displaySeatingArrangement(arrangement) {
     const seatingArea = document.querySelector('.seating-area');
     seatingArea.innerHTML = ''; // Clear previous seating arrangement
 
-    arrangement.forEach(row => {
+    arrangement.forEach(row => { //to do row/seat index
         const rowDiv = document.createElement('div');
         rowDiv.classList.add('row');
 

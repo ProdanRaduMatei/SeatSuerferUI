@@ -72,15 +72,15 @@ body {
     cursor: pointer;
 }
 
-.seat.rotated-left {
+.seat.facing-inwards-right {
     transform: rotate(90deg);
 }
 
-.seat.rotated-right {
+.seat.facing-inwards-left {
     transform: rotate(-90deg);
 }
 
-.seat.rotated-up {
+.seat.upside-down {
     transform: rotate(180deg);
 }
 
