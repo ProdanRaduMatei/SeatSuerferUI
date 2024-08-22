@@ -9,50 +9,73 @@
         <title>SeatSurfer</title>
     </head>
     <body>
-        <div class="floor-container">
-            <label>Select the floor:</label>
-            <select id="floor" title="Select the floor and date" onchange="loadSeatingArrangement()">
-                <option value="etaj4/day1.json">Floor 4: 31.07.2024</option>
-                <option value="etaj4/day2.json">Floor 4: 01.08.2024</option>
-                <option value="etaj6/day1.json">Floor 6: 31.07.2024</option>
-                <option value="etaj6/day2.json">Floor 6: 01.08.2024</option>
-            </select>
+        <div class="landing">
+            <h1>SeatSurfer</h1>
+            <h2>Book your seat!</h2>
+            <div class="landing-buttons">
+                <button class="button">Login</button>
+                <button class="button">Select seat</button>
+            </div>
         </div>
-
-        <ul class="showcase">
-            <li>
-                <div class="seat"></div>
-                <small>Available</small>
-            </li>
-            <li>
-                <div class="seat selected"></div>
-                <small>Selected</small>
-            </li>
-            <li>
-                <div class="seat occupied"></div>
-                <small>Occupied</small>
-            </li>
-        </ul>
-
-        <div class="container">
-            <div class="seating-area"></div>
+        <div class="login">
+            <h1>SeatSurfer</h1>
+            <form method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required />
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required />
+                <div class="button-container">
+                    <button type="submit" class="button">Login</button>
+                </div>
+            </form>
         </div>
+        <div class="seat-selector">
+            <div class="floor-container">
+                <label>Select the floor:</label>
+                <select id="floor" title="Select the floor and date" onchange="loadSeatingArrangement()">
+                    <option value="etaj4/day1.json">Floor 4: 31.07.2024</option>
+                    <option value="etaj4/day2.json">Floor 4: 01.08.2024</option>
+                    <option value="etaj6/day1.json">Floor 6: 31.07.2024</option>
+                    <option value="etaj6/day2.json">Floor 6: 01.08.2024</option>
+                    <option value="emptyStorey/emptyStorey.json">Add new floor</option>
+                </select>
+            </div>
 
-        <p class="text">You selected <span id="seat-counter">0</span> seats. <button class="select">SELECT</button></p>
+            <ul class="showcase">
+                <li>
+                    <div class="seat"></div>
+                    <small>Available</small>
+                </li>
+                <li>
+                    <div class="seat selected"></div>
+                    <small>Selected</small>
+                </li>
+                <li>
+                    <div class="seat occupied"></div>
+                    <small>Occupied</small>
+                </li>
+            </ul>
 
-        <div id="modal" class="modal">
-            <div class="modal-content">
-                <h2>Book seats</h2>
-                <form id="seatForm">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" required />
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" required />
-                </form>
-                <p id="seat-message"></p>
-                <div class="modal-buttons">
-                    <button class="close-modal">Close</button>
-                    <button class="confirm-seat">Confirm</button>
+            <div class="container">
+                <div class="seating-area"></div>
+            </div>
+
+            <p class="text">You selected <span id="seat-counter">0</span> seats. <button class="select button">SELECT</button></p>
+
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <h2>Book seats</h2>
+                    <form id="seatForm">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" required />
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" required />
+                    </form>
+                    <p id="seat-message"></p>
+                    <div class="modal-buttons">
+                        <button class="close-modal">Close</button>
+                        <button class="confirm-seat">Confirm</button>
+                    </div>
                 </div>
             </div>
         </div>

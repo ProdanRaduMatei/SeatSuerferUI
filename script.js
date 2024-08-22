@@ -29,10 +29,7 @@ const closeModal = () => {
 };
 
 
-function updateSeatCounter() {
-    const seatCounter = document.querySelector('.seat-counter');
-    seatCounter.textContent = `You selected ${selectedSeatCount} seats.`;
-}
+
 
 const fetchJsonData = url => {
     fetch(url)
@@ -77,6 +74,13 @@ const handleStoreySection = () => {
             .catch(error => console.error('Error:', error));
             console.log('url-ul este ', url);
             break;
+        case '5':
+            fetch('emptyStorey/emtpyStorey.json')
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+            console.log('url-ul este ', url);
+            break;
     }
     fetchJsonData(url);
 };
@@ -107,28 +111,10 @@ function updateSeatCounter() {
 function getSeatClasses(seat) {
     const classes = ['seat'];
     switch (seat) {
-        case 11:
+        case 1:
             break;
-        case 12:
-            classes.push('facing-inwards-right');
-            break;
-        case 13:
-            classes.push('upside-down');
-            break;
-        case 14:
-            classes.push('facing-inwards-left');
-            break;
-        case 21:
+        case 2:
             classes.push('occupied');
-            break;
-        case 22:
-            classes.push('occupied', 'facing-inwards-right');
-            break;
-        case 23:
-            classes.push('occupied', 'upside-down');
-            break;
-        case 24:
-            classes.push('occupied', 'facing-inwards-left');
             break;
         case 0:
             classes.push('corridor');
@@ -170,5 +156,64 @@ function displaySeatingArrangement(arrangement) {
         seatingArea.appendChild(rowDiv);
     });
 }
+
+function validateCredentials(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (username === 'admin' && password === 'admin') {
+        document.querySelector('.login').style.display = 'none';
+        document.querySelector('.seat-selector').style.display = 'block';
+    } else {
+        alert('Invalid credentials');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loginButton = document.querySelector('.landing-buttons .button:nth-child(1)');
+    const selectSeatButton = document.querySelector('.landing-buttons .button:nth-child(2)');
+    const loginDiv = document.querySelector('.login');
+    const seatSelectorDiv = document.querySelector('.seat-selector');
+    const landingDiv = document.querySelector('.landing');
+    const addNewFloorOption = document.querySelector('#floor option[value="emptyStorey/emptyStorey.json"]');
+
+    loginButton.addEventListener('click', () => {
+        if (!loginDiv.classList.contains('admin-logged-in')) {
+            loginDiv.style.display = 'block';
+        }
+        seatSelectorDiv.style.display = 'none';
+        landingDiv.style.display = 'none';
+    });
+
+    selectSeatButton.addEventListener('click', () => {
+        seatSelectorDiv.style.display = 'block';
+        loginDiv.style.display = 'none';
+        landingDiv.style.display = 'none';
+    });
+
+    const loginForm = document.querySelector('.login form');
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (username === 'admin' && password === 'admin') {
+            addNewFloorOption.style.display = 'block';
+            loginDiv.classList.add('admin-logged-in');
+        } else {
+            addNewFloorOption.style.display = 'none';
+        }
+
+        loginDiv.style.display = 'none';
+        seatSelectorDiv.style.display = 'block';
+    });
+
+    addNewFloorOption.style.display = 'none';
+});
+
+const loginForm = document.querySelector('.login form');
+loginForm.addEventListener('submit', validateCredentials);
 
 document.addEventListener('DOMContentLoaded', loadSeatingArrangement);
