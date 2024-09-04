@@ -107,6 +107,8 @@ body {
     border: 2px solid grey;
     border-radius: 50%;
     cursor: pointer;
+    line-height: 50px;
+    color: white;
 }
 
 .seat.selected {

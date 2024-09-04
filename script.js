@@ -123,7 +123,7 @@ function getSeatClasses(seat) {
     return classes;
 };
 
-function createSeatElement(seat, seatIndex) {
+function createSeatElement(seat, rowIndex, seatIndex) {
     const seatDiv = document.createElement('div');
     const classes = getSeatClasses(seat);
     seatDiv.classList.add(...classes);
@@ -135,6 +135,11 @@ function createSeatElement(seat, seatIndex) {
             selectedSeatCount += seatDiv.classList.contains('selected') ? 1 : -1;
             updateSeatCounter();
         });
+
+        seatDiv.addEventListener('mouseover', () => {
+            const seatNumber = `R${rowIndex + 1}S${seatIndex + 1}`;
+            seatDiv.setAttribute('title', seatNumber);
+        });
     }
 
     return seatDiv;
@@ -144,16 +149,26 @@ function displaySeatingArrangement(arrangement) {
     const seatingArea = document.querySelector('.seating-area');
     seatingArea.innerHTML = '';
 
+    let displayRowIndex = 0;
     arrangement.forEach((row, rowIndex) => {
         const rowDiv = document.createElement('div');
         rowDiv.classList.add('row');
 
-        row.forEach((seat, seatIndex) => {
-            const seatDiv = createSeatElement(seat, seatIndex);
+        let seatIndex = 0;
+        let hasNonCorridorSeat = false;
+        row.forEach((seat) => {
+            const seatDiv = createSeatElement(seat, displayRowIndex, seatIndex);
             rowDiv.appendChild(seatDiv);
+            if (seat !== 0) { // Only increment seatIndex for non-corridor seats
+                seatIndex++;
+                hasNonCorridorSeat = true;
+            }
         });
 
         seatingArea.appendChild(rowDiv);
+        if (hasNonCorridorSeat) {
+            displayRowIndex++;
+        }
     });
 }
 
