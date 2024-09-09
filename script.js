@@ -28,72 +28,47 @@ const closeModal = () => {
     modal.style.display = 'none';
 };
 
-
-
-
 const fetchJsonData = url => {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-        const seatingArrangement = data.arrangement;
-        generateSeats(seatingArrangement);
+            const seatingArrangement = data.arrangement;
+            generateSeats(seatingArrangement);
         });
 };
 
-const handleStoreySection = () => {
-    const floorSelect = document.getElementById('floor');
-    const selectedMovieValue = floorSelect.value;
-    let url;
+let selectedFloor = '';
+let selectedDay = '';
 
-    switch (selectedMovieValue) {
-        case '1':
-            fetch('etaj4/day1.json')
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
-            console.log('url-ul este ', url);
-            break;
-        case '2':
-            fetch('etaj4/day2.json')
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
-            console.log('url-ul este ', url);
-            break;
-        case '3':
-            fetch('etaj6/day2.json')
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
-            console.log('url-ul este ', url);
-            break;
-        case '4':
-            fetch('etaj6/day2.json')
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
-            console.log('url-ul este ', url);
-            break;
-        case '5':
-            fetch('emptyStorey/emtpyStorey.json')
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
-            console.log('url-ul este ', url);
-            break;
-    }
-    fetchJsonData(url);
-};
+function selectFloor(floor) {
+    selectedFloor = floor;
+    updateButtonSelection('.floor-button', floor);
+    document.getElementById('selected-floor').textContent = floor.replace('etaj', '');
+    loadSeatingArrangement();
+}
 
-const floorSelect = document.getElementById('floor');
-floorSelect.addEventListener('change', handleStoreySection);
+function selectDay(day) {
+    selectedDay = day;
+    updateButtonSelection('.day-button', day);
+    document.getElementById('selected-day').textContent = day.replace('.json', '');
+    loadSeatingArrangement();
+}
 
-handleStoreySection();
+function updateButtonSelection(buttonClass, value) {
+    const buttons = document.querySelectorAll(buttonClass);
+    buttons.forEach(button => {
+        if (button.getAttribute('onclick').includes(value)) {
+            button.classList.add('selected');
+        } else {
+            button.classList.remove('selected');
+        }
+    });
+}
 
 async function loadSeatingArrangement() {
-    const select = document.getElementById('floor');
-    const filePath = select.value;
+    if (!selectedFloor || !selectedDay) return;
 
+    const filePath = `${selectedFloor}/${selectedDay}`;
     try {
         const response = await fetch(filePath);
         const data = await response.json();
@@ -101,7 +76,7 @@ async function loadSeatingArrangement() {
     } catch (error) {
         console.error('Error fetching the JSON data:', error);
     }
-};
+}
 
 function updateSeatCounter() {
     const seatCounter = document.getElementById('seat-counter');

@@ -33,14 +33,23 @@
         </div>
         <div class="seat-selector">
             <div class="floor-container">
-                <label>Select the floor:</label>
-                <select id="floor" title="Select the floor and date" onchange="loadSeatingArrangement()">
-                    <option value="etaj4/day1.json">Floor 4: 31.07.2024</option>
-                    <option value="etaj4/day2.json">Floor 4: 01.08.2024</option>
-                    <option value="etaj6/day1.json">Floor 6: 31.07.2024</option>
-                    <option value="etaj6/day2.json">Floor 6: 01.08.2024</option>
-                    <option value="emptyStorey/emptyStorey.json">Add new floor</option>
-                </select>
+                <div class="floor-buttons">
+                    <label>Select the floor:</label>
+                    <button id="floor4" class="floor-button button" onclick="selectFloor('etaj4')">Floor 4</button>
+                    <button id="floor6" class="floor-button button" onclick="selectFloor('etaj6')">Floor 6</button>
+                </div>
+                <div class="day-buttons">
+                    <label>Select the day:</label>
+                    <button id="monday" class="day-button button" onclick="selectDay('monday.json')">Monday</button>
+                    <button id="tuesday" class="day-button button" onclick="selectDay('tuesday.json')">Tuesday</button>
+                    <button id="wednesday" class="day-button button" onclick="selectDay('wednesday.json')">Wednesday</button>
+                    <button id="thursday" class="day-button button" onclick="selectDay('thursday.json')">Thursday</button>
+                    <button id="friday" class="day-button button" onclick="selectDay('friday.json')">Friday</button>
+                </div>
+            </div>
+            <div class="selected-options">
+                <p class="text">Floor: <span id="selected-floor"></span></p>
+                <p class="text">Day: <span id="selected-day"></span></p>
             </div>
 
             <ul class="showcase">

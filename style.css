@@ -47,21 +47,23 @@ body {
 
 .floor-container {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    margin: 20px 0;
+    padding: 10px;
 }
 
-.floor-container select {
-    background-color: #fff;
-        border: 0;
-        border-radius: 5px;
-        font-size: 14px;
-        margin-left: 10px;
-        padding: 5px 15px 5px 15px;
-        -moz-appearance: none;
-        -webkit-appearance: none;
-        appearance: none;
+.floor-container .floor-buttons,
+.floor-container .day-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.floor-container .floor-buttons {
+    align-items: flex-start;
+}
+
+.floor-container .day-buttons {
+    align-items: flex-end;
 }
 
 .container {
