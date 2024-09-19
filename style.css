@@ -66,6 +66,10 @@ body {
     align-items: flex-end;
 }
 
+.current-day {
+    background-color: #d3d3d3;
+}
+
 .container {
     display: flex;
     flex-direction: column;

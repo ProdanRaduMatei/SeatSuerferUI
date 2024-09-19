@@ -1,4 +1,5 @@
 let bookingMessageDisplayed = false;
+let selectedSeatCount = 0;
 const container = document.querySelector('.container');
 
 const generateBookingMessage = () => {
@@ -7,36 +8,10 @@ const generateBookingMessage = () => {
     seatMessage.textContent = `You have selected ${seatCounter} seats.`;
 };
 
-let isAddingNewFloor = false;
-
-document.getElementById('floor4').addEventListener('click', () => {
-    isAddingNewFloor = false; // Set to false
-    selectFloor('etaj4');
-    document.querySelector('.selected-seats-message').style.display = 'block'; // Show the "You selected..." section
-});
-
-document.getElementById('floor6').addEventListener('click', () => {
-    isAddingNewFloor = false; // Set to false
-    selectFloor('etaj6');
-    document.querySelector('.selected-seats-message').style.display = 'block'; // Show the "You selected..." section
-});
-
-document.getElementById('add-new-floor').addEventListener('click', () => {
-    isAddingNewFloor = true;
-    addNewFloor(); // Call the addNewFloor function
-    document.getElementById('save-layout-container').style.display = 'block'; // Show the Save layout button
-    document.querySelector('.selected-seats-message').style.display = 'none'; // Hide the "You selected..." section
-    document.querySelector('.selected-options').style.display = 'none'; // Hide the selected items section
-});
-
 const selectButton = document.querySelector('.select');
 selectButton.addEventListener('click', () => {
     generateBookingMessage();
     openModal();
-});
-
-document.getElementById('save-layout').addEventListener('click', () => {
-    openAdminModal();
 });
 
 const openModal = () => {
@@ -53,47 +28,6 @@ const closeModal = () => {
     modal.style.display = 'none';
 };
 
-const openAdminModal = () => {
-    const adminModal = document.getElementById('admin-modal');
-    const closeAdminModalButton = document.querySelector('.close-admin-modal');
-    const confirmAdminButton = document.querySelector('.confirm-admin');
-
-    adminModal.style.display = 'block';
-
-    closeAdminModalButton.addEventListener('click', closeAdminModal);
-    confirmAdminButton.addEventListener('click', handleAdminFormSubmission);
-};
-
-const closeAdminModal = () => {
-    const adminModal = document.getElementById('admin-modal');
-    adminModal.style.display = 'none';
-};
-
-const handleAdminFormSubmission = () => {
-    const floorName = document.getElementById('floorName').value;
-    const days = Array.from(document.querySelectorAll('#days input:checked')).map(checkbox => checkbox.value);
-    const endPeriod = document.getElementById('endPeriod').value;
-
-    console.log('Floor Name/Number:', floorName);
-    console.log('Days:', days);
-    console.log('End Period:', endPeriod);
-
-    // Process the data as needed
-    closeAdminModal();
-};
-
-function addNewFloor() {
-    fetch('emptyStorey/emptyStorey.json')
-        .then(response => response.json())
-        .then(data => {
-            const emptyStoreyArrangement = data.arrangement;
-            displaySeatingArrangement(emptyStoreyArrangement);
-            document.getElementById('message').style.display = 'block';
-        })
-        .catch(error => console.error('Error fetching emptyStorey.json:', error));
-}
-
-
 const fetchJsonData = url => {
     fetch(url)
         .then(response => response.json())
@@ -106,14 +40,7 @@ const fetchJsonData = url => {
 let selectedFloor = '';
 let selectedDay = '';
 
-let selectedSeatPositions = [];
-let selectedSeatCount = 0;
-
 function selectFloor(floor) {
-    if (floor === 'newFloor') {
-        addNewFloor();
-        return;
-    }
     selectedFloor = floor;
     updateButtonSelection('.floor-button', floor);
     document.getElementById('selected-floor').textContent = floor.replace('etaj', '');
@@ -121,7 +48,7 @@ function selectFloor(floor) {
 }
 
 function selectDay(day) {
-    selectedDay = getDateForDay(day);
+    selectedDay = day;
     updateButtonSelection('.day-button', day);
     document.getElementById('selected-day').textContent = day.replace('.json', '');
     loadSeatingArrangement();
@@ -141,9 +68,9 @@ function updateButtonSelection(buttonClass, value) {
 async function loadSeatingArrangement() {
     if (!selectedFloor || !selectedDay) return;
 
-    const url = `/api/seats/empty?storeyName=${selectedFloor}&date=${selectedDay}`;
+    const filePath = `${selectedFloor}/${selectedDay}`;
     try {
-        const response = await fetch(url);
+        const response = await fetch(filePath);
         const data = await response.json();
         displaySeatingArrangement(data.arrangement);
         await fetchEmptySeats(selectedFloor, selectedDay); // Fetch empty seats
@@ -155,30 +82,6 @@ async function loadSeatingArrangement() {
         console.error('Error fetching the JSON data:', error);
     }
 }
-
-function getToday() {
-    const today = new Date();
-    const options = { weekday: 'long' };
-    return today.toLocaleDateString('en-US', options);
-}
-
-function getDateForDay(day) {
-    const today = new Date();
-    const todayDayIndex = today.getDay(); // 0 (Sunday) to 6 (Saturday)
-    const targetDayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(day);
-
-    let daysToAdd = targetDayIndex - todayDayIndex;
-    if (daysToAdd < 0) {
-        daysToAdd += 7; // Move to the next week
-    }
-
-    const targetDate = new Date(today);
-    targetDate.setDate(today.getDate() + daysToAdd);
-    return targetDate.toISOString().split('T')[0]; // Return date in YYYY-MM-DD format
-}
-
-console.log(getToday()); // Outputs the current day
-console.log(getDateForDay('Wednesday')); // Outputs the date for the next Wednesday
 
 async function fetchEmptySeats(selectedFloor, selectedDay) {
     const url = `/api/seats/empty?storeyName=${selectedFloor}&date=${selectedDay}`;
@@ -257,6 +160,47 @@ async function fetchNrOfSeats(selectedFloor, selectedDay) {
     }
 }
 
+async function bookSeat(date, userName, email, col, line) {
+    const url = `/api/bookings`;
+    const payload = {
+        date: date,
+        userName: userName,
+        email: email,
+        col: col,
+        line: line
+    };
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        console.log('Booking successful:', data);
+    } catch (error) {
+        console.error('Error booking seat:', error);
+    }
+}
+
+const confirmButton = document.getElementById('confirm-seat');
+confirmButton.addEventListener('click', () => {
+    const date = new Date().toISOString();
+    const userName = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const col = selectedSeatCol; // Assume you have a way to get the selected seat's column
+    const line = selectedSeatLine; // Assume you have a way to get the selected seat's line
+
+    bookSeat(date, userName, email, col, line);
+    closeModal();
+});
+
+function updateSeatCounter() {
+    const seatCounter = document.getElementById('seat-counter');
+    seatCounter.textContent = `${selectedSeatCount}`;
+};
+
 function getSeatClasses(seat) {
     const classes = ['seat'];
     switch (seat) {
@@ -270,7 +214,7 @@ function getSeatClasses(seat) {
             break;
     }
     return classes;
-}
+};
 
 function createSeatElement(seat, rowIndex, seatIndex) {
     const seatDiv = document.createElement('div');
@@ -281,15 +225,7 @@ function createSeatElement(seat, rowIndex, seatIndex) {
     if (!seatDiv.classList.contains('occupied') && !seatDiv.classList.contains('corridor')) {
         seatDiv.addEventListener('click', () => {
             seatDiv.classList.toggle('selected');
-            if (seatDiv.classList.contains('selected')) {
-                selectedSeatPositions.push({ row: rowIndex, seat: seatIndex });
-                selectedSeatCount++;
-            } else {
-                selectedSeatPositions = selectedSeatPositions.filter(
-                    pos => !(pos.row === rowIndex && pos.seat === seatIndex)
-                );
-                selectedSeatCount--;
-            }
+            selectedSeatCount += seatDiv.classList.contains('selected') ? 1 : -1;
             updateSeatCounter();
         });
 
@@ -300,11 +236,6 @@ function createSeatElement(seat, rowIndex, seatIndex) {
     }
 
     return seatDiv;
-}
-
-function updateSeatCounter() {
-    const seatCounter = document.getElementById('seat-counter');
-    seatCounter.textContent = `${selectedSeatCount}`;
 }
 
 function displaySeatingArrangement(arrangement) {
@@ -354,16 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginDiv = document.querySelector('.login');
     const seatSelectorDiv = document.querySelector('.seat-selector');
     const landingDiv = document.querySelector('.landing');
-    const addNewFloorButton = document.getElementById('add-new-floor');
-
-    const today = new Date();
-    const options = { weekday: 'long' };
-    const currentDay = today.toLocaleDateString('en-US', options).toLowerCase();
-
-    const currentDayButton = document.getElementById(currentDay);
-    if (currentDayButton) {
-        currentDayButton.classList.add('current-day');
-    }
+    const addNewFloorOption = document.querySelector('#floor option[value="emptyStorey/emptyStorey.json"]');
 
     loginButton.addEventListener('click', () => {
         if (!loginDiv.classList.contains('admin-logged-in')) {
@@ -386,17 +308,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
 
         if (username === 'admin' && password === 'admin') {
-            addNewFloorButton.style.display = 'block';
+            addNewFloorOption.style.display = 'block';
             loginDiv.classList.add('admin-logged-in');
         } else {
-            addNewFloorButton.style.display = 'none';
+            addNewFloorOption.style.display = 'none';
         }
 
         loginDiv.style.display = 'none';
         seatSelectorDiv.style.display = 'block';
     });
 
-    addNewFloorButton.style.display = 'none';
+    addNewFloorOption.style.display = 'none';
 });
 
 const loginForm = document.querySelector('.login form');

@@ -37,6 +37,7 @@
                     <label>Select the floor:</label>
                     <button id="floor4" class="floor-button button" onclick="selectFloor('etaj4')">Floor 4</button>
                     <button id="floor6" class="floor-button button" onclick="selectFloor('etaj6')">Floor 6</button>
+                    <button id="add-new-floor" class="button" style="display: none;">Add new floor</button>
                 </div>
                 <div class="day-buttons">
                     <label>Select the day:</label>
@@ -51,6 +52,7 @@
                 <p class="text">Floor: <span id="selected-floor"></span></p>
                 <p class="text">Day: <span id="selected-day"></span></p>
             </div>
+            <div id="message" class="message" style="display: none;">Click where you want to put seats</div>
 
             <ul class="showcase">
                 <li>
@@ -71,7 +73,8 @@
                 <div class="seating-area"></div>
             </div>
 
-            <p class="text">You selected <span id="seat-counter">0</span> seats. <button class="select button">SELECT</button></p>
+            <p class="text selected-seats-message">You selected <span id="seat-counter">0</span> seats. <button class="select button">SELECT</button></p>
+            <p class="text" id="save-layout-container" style="display: none;"><button id="save-layout" class="button">SAVE</button></p>
 
             <div id="modal" class="modal">
                 <div class="modal-content">
@@ -87,6 +90,32 @@
                         <button class="close-modal">Close</button>
                         <button class="confirm-seat">Confirm</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-modal" class="modal">
+            <div class="modal-content">
+                <h2>Create New Floor</h2>
+                <form id="adminForm" style="margin-bottom: 15px">
+                    <label for="floorName">Floor Name/Number:</label>
+                    <input type="text" id="floorName" required />
+
+                    <label for="days">Days:</label>
+                    <div id="days" style="margin-bottom: 10px">
+                        <div><input type="checkbox" id="monday" name="days" value="Monday"> Monday</div>
+                        <div><input type="checkbox" id="tuesday" name="days" value="Tuesday"> Tuesday</div>
+                        <div><input type="checkbox" id="wednesday" name="days" value="Wednesday"> Wednesday</div>
+                        <div><input type="checkbox" id="thursday" name="days" value="Thursday"> Thursday</div>
+                        <div><input type="checkbox" id="friday" name="days" value="Friday"> Friday</div>
+                    </div>
+
+                    <label for="endPeriod">End Period (optional):</label>
+                    <input type="date" id="endPeriod" />
+                </form>
+                <div class="modal-buttons">
+                    <button class="close-admin-modal">Close</button>
+                    <button class="confirm-admin">Confirm</button>
                 </div>
             </div>
         </div>
