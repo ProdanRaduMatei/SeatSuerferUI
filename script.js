@@ -1,34 +1,3 @@
-let bookingMessageDisplayed = false;
-const container = document.querySelector('.container');
-
-const generateBookingMessage = () => {
-    const seatCounter = document.getElementById('seat-counter').textContent;
-    const seatMessage = document.getElementById('seat-message');
-    seatMessage.textContent = `You have selected ${seatCounter} seats.`;
-};
-
-let isAddingNewFloor = false;
-
-document.getElementById('floor4').addEventListener('click', () => {
-    isAddingNewFloor = false; // Set to false
-    selectFloor('etaj4');
-    document.querySelector('.selected-seats-message').style.display = 'block'; // Show the "You selected..." section
-});
-
-document.getElementById('floor6').addEventListener('click', () => {
-    isAddingNewFloor = false; // Set to false
-    selectFloor('etaj6');
-    document.querySelector('.selected-seats-message').style.display = 'block'; // Show the "You selected..." section
-});
-
-document.getElementById('add-new-floor').addEventListener('click', () => {
-    isAddingNewFloor = true;
-    addNewFloor(); // Call the addNewFloor function
-    document.getElementById('save-layout-container').style.display = 'block'; // Show the Save layout button
-    document.querySelector('.selected-seats-message').style.display = 'none'; // Hide the "You selected..." section
-    document.querySelector('.selected-options').style.display = 'none'; // Hide the selected items section
-});
-
 const selectButton = document.querySelector('.select');
 selectButton.addEventListener('click', () => {
     generateBookingMessage();
@@ -144,6 +113,9 @@ async function loadSeatingArrangement() {
     const url = `/api/seats/empty?storeyName=${selectedFloor}&date=${selectedDay}`;
     try {
         const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         displaySeatingArrangement(data.arrangement);
         await fetchEmptySeats(selectedFloor, selectedDay); // Fetch empty seats
@@ -169,7 +141,18 @@ function getDateForDay(day) {
 
     let daysToAdd = targetDayIndex - todayDayIndex;
     if (daysToAdd < 0) {
-        daysToAdd += 7; // Move to the next week
+        if (daysToAdd === -1)
+            daysToAdd = 6;
+        if (daysToAdd === -2)
+            daysToAdd = 5;
+        if (daysToAdd === -3)
+            daysToAdd = 4;
+        if (daysToAdd === -4)
+            daysToAdd = 3;
+        if (daysToAdd === -5)
+            daysToAdd = 2;
+        if (daysToAdd === -6)
+            daysToAdd = 1;
     }
 
     const targetDate = new Date(today);
@@ -397,6 +380,67 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     addNewFloorButton.style.display = 'none';
+
+    let bookingMessageDisplayed = false;
+    const container = document.querySelector('.container');
+
+    const generateBookingMessage = () => {
+        const seatCounter = document.getElementById('seat-counter').textContent;
+        const seatMessage = document.getElementById('seat-message');
+        seatMessage.textContent = `You have selected ${seatCounter} seats.`;
+    };
+
+    let isAddingNewFloor = false;
+
+    document.getElementById('floor4').addEventListener('click', () => {
+        isAddingNewFloor = false; // Set to false
+        selectFloor('etaj4');
+        document.querySelector('.selected-seats-message').style.display = 'block'; // Show the "You selected..." section
+    });
+
+    document.getElementById('floor6').addEventListener('click', () => {
+        isAddingNewFloor = false; // Set to false
+        selectFloor('etaj6');
+        document.querySelector('.selected-seats-message').style.display = 'block'; // Show the "You selected..." section
+    });
+
+    document.getElementById('add-new-floor').addEventListener('click', () => {
+        isAddingNewFloor = true;
+        addNewFloor(); // Call the addNewFloor function
+        document.getElementById('save-layout-container').style.display = 'block'; // Show the Save layout button
+        document.querySelector('.selected-seats-message').style.display = 'none'; // Hide the "You selected..." section
+        document.querySelector('.selected-options').style.display = 'none'; // Hide the selected items section
+    });
+
+    document.getElementById('monday').addEventListener('click', () => {
+        selectDay('Monday');
+    });
+
+    document.getElementById('tuesday').addEventListener('click', () => {
+        selectDay('Tuesday');
+    });
+
+    document.getElementById('wednesday').addEventListener('click', () => {
+        selectDay('Wednesday');
+    });
+
+    document.getElementById('thursday').addEventListener('click', () => {
+        selectDay('Thursday');
+    });
+
+    document.getElementById('friday').addEventListener('click', () => {
+        selectDay('Friday');
+    });
+
+    const selectButton = document.querySelector('.select');
+    selectButton.addEventListener('click', () => {
+        generateBookingMessage();
+        openModal();
+    });
+
+    document.getElementById('save-layout').addEventListener('click', () => {
+        openAdminModal();
+    });
 });
 
 const loginForm = document.querySelector('.login form');
