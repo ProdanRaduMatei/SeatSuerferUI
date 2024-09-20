@@ -110,14 +110,18 @@ function updateButtonSelection(buttonClass, value) {
 async function loadSeatingArrangement() {
     if (!selectedFloor || !selectedDay) return;
 
-    const url = `/api/seats/empty?storeyName=${selectedFloor}&date=${selectedDay}`;
+    const url = `http://localhost:8080/api/seats/empty?storeyName=${selectedFloor}&date=${selectedDay}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        displaySeatingArrangement(data.arrangement);
+        const seatMatrix = await response.json();
+
+        // Save the matrix in a response.json file
+        saveMatrixToFile(seatMatrix);
+
+        displaySeatingArrangement(seatMatrix);
         await fetchEmptySeats(selectedFloor, selectedDay); // Fetch empty seats
         await fetchBookedSeats(selectedFloor, selectedDay); // Fetch booked seats
         await fetchNrOfBookedSeats(selectedFloor, selectedDay); // Fetch number of booked seats
@@ -126,6 +130,18 @@ async function loadSeatingArrangement() {
     } catch (error) {
         console.error('Error fetching the JSON data:', error);
     }
+}
+
+function saveMatrixToFile(matrix) {
+    const fs = require('fs');
+    const filePath = 'response.json';
+    fs.writeFile(filePath, JSON.stringify(matrix, null, 2), (err) => {
+        if (err) {
+            console.error('Error saving the matrix to file:', err);
+        } else {
+            console.log('Matrix saved to response.json');
+        }
+    });
 }
 
 function getToday() {
@@ -157,7 +173,7 @@ function getDateForDay(day) {
 
     const targetDate = new Date(today);
     targetDate.setDate(today.getDate() + daysToAdd);
-    return targetDate.toISOString().split('T')[0]; // Return date in YYYY-MM-DD format
+    return targetDate.toISOString().split('.')[0] + 'Z'; // Return date in YYYY-MM-DDTHH:MM:SSZ format
 }
 
 console.log(getToday()); // Outputs the current day
