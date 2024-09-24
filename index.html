@@ -21,15 +21,16 @@
         </div>
         <div class="login">
             <h1>SeatSurfer</h1>
-            <form method="post">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required />
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required />
-                <div class="button-container">
-                    <button type="submit" class="button">Login</button>
-                </div>
-            </form>
+            <div id="login-section" class="login">
+                <form id="loginForm">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                    <button type="submit">Log In</button>
+                </form>
+                <p id="login-error" style="color:red; display:none;">Invalid credentials, please try again.</p>
+            </div>
         </div>
         <div class="seat-selector">
             <div class="floor-container">
@@ -74,6 +75,7 @@
             </div>
 
             <p class="text selected-seats-message">You selected <span id="seat-counter">0</span> seats. <button class="select button">SELECT</button></p>
+            <button onclick="handleSeatReservation(selectedSeatId, selectedDate, 'User Name')">Reserve and Confirm Seat</button>
             <p class="text" id="save-layout-container" style="display: none;"><button id="save-layout" class="button">SAVE</button></p>
 
             <div id="modal" class="modal">
@@ -92,6 +94,7 @@
                     </div>
                 </div>
             </div>
+            <button id="logout-button" onclick="logout()">Log Out</button>
         </div>
 
         <div id="admin-modal" class="modal">

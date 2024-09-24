@@ -107,16 +107,27 @@ function updateButtonSelection(buttonClass, value) {
     });
 }
 
+let seatMatrix = new Array(24).fill(0).map(() => new Array(24).fill(0));
+
 async function loadSeatingArrangement() {
     if (!selectedFloor || !selectedDay) return;
 
-    const url = `http://localhost:8080/api/seats/empty?storeyName=${selectedFloor}&date=${selectedDay}`;
+    const url = `http://localhost:8080/api/seats/all?storeyName=${selectedFloor}&date=${selectedDay}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const seatMatrix = await response.json();
+        const fetchedMatrix = await response.json();
+
+        // Update the existing seatMatrix with the fetched data
+        for (let i = 0; i < fetchedMatrix.length; i++) {
+            for (let j = 0; j < fetchedMatrix[i].length; j++) {
+                if (fetchedMatrix[i][j] !== 0) {
+                    seatMatrix[i][j] = fetchedMatrix[i][j];
+                }
+            }
+        }
 
         // Save the matrix in a response.json file
         saveMatrixToFile(seatMatrix);
@@ -140,33 +151,37 @@ function saveMatrixToFile(matrix) {
 
 function getToday() {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to 00:00:00
     const options = { weekday: 'long' };
     return today.toLocaleDateString('en-US', options);
 }
 
 function getDateForDay(day) {
     const today = new Date();
-    const todayDayIndex = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+    today.setUTCHours(0, 0, 0, 0); // Set time to 00:00:00 UTC
+    const todayDayIndex = today.getUTCDay(); // 0 (Sunday) to 6 (Saturday)
     const targetDayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(day);
+
 
     let daysToAdd = targetDayIndex - todayDayIndex;
     if (daysToAdd < 0) {
         if (daysToAdd === -1)
-            daysToAdd = 6;
+            daysToAdd = 7;
         if (daysToAdd === -2)
-            daysToAdd = 5;
+            daysToAdd = 6;
         if (daysToAdd === -3)
-            daysToAdd = 4;
+            daysToAdd = 5;
         if (daysToAdd === -4)
-            daysToAdd = 3;
+            daysToAdd = 4;
         if (daysToAdd === -5)
-            daysToAdd = 2;
+            daysToAdd = 3;
         if (daysToAdd === -6)
-            daysToAdd = 1;
+            daysToAdd = 2;
     }
 
     const targetDate = new Date(today);
-    targetDate.setDate(today.getDate() + daysToAdd);
+    targetDate.setUTCDate(today.getUTCDate() + daysToAdd);
+    targetDate.setUTCHours(0, 0, 0, 0); // Ensure time is 00:00:00 UTC
     return targetDate.toISOString().split('.')[0] + 'Z'; // Return date in YYYY-MM-DDTHH:MM:SSZ format
 }
 
@@ -194,6 +209,49 @@ async function fetchBookedSeats(selectedFloor, selectedDay) {
         console.log(data);
     } catch (error) {
         console.error('Error fetching booked seats:', error);
+    }
+}
+
+//Check seat availability
+async function checkSeatAvailability(seatId, date) {
+    const response = await fetch(`/api/seats/checkSeatAvailability?seatId=${seatId}&date=${date}`);
+    const isAvailable = await response.json();
+    return isAvailable;
+}
+
+//Reserve seat
+async function reserveSeat(seatData) {
+    const response = await fetch(`/api/seats/reserve`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(seatData)
+    });
+    return await response.json();
+}
+
+//Function to initiate reservation flow
+async function handleSeatReservation(seatId, date, userName) {
+    const isAvailable = await checkSeatAvailability(seatId, date);
+    if (isAvailable) {
+        const seatData = {seat: { id: seatId }, date, userName};
+        const reservationResponse = await reserveSeat(seatData);
+
+        if (reserveResponse === 'Seat reserved successfully') {
+            alert('Seat reserved! Proceed to confirm.');
+            const bookingId = reservationResponse.bookingId;
+            const confirmResponse = await confirmBooking(bookingId);
+            if (confirmResponse === 'Booking confirmed') {
+                alert('Booking confirmed!');
+            } else {
+                alert('Failed to confirm booking.');
+            }
+        } else {
+            alert('Seat is already booked.');
+        }
+    } else {
+        alert('Seat is not available.');
     }
 }
 
@@ -322,6 +380,72 @@ function displaySeatingArrangement(arrangement) {
         }
     });
 }
+
+// Function to log in and store JWT
+async function login(username, password) {
+    const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+
+    if (response.ok) {
+        const token = await response.text();
+        localStorage.setItem('jwt', token);
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+        alert('Login successful');
+    } else {
+        document.getElementById('login-error').style.display = 'block';
+    }
+}
+
+// Attach JWT to all authorized requests
+async function fetchData(url) {
+    const token = localStorage.getItem('jwt');
+    const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (response.status === 401) {
+        alert('Unauthorized. Please log in again.');
+        logout();
+        return null;
+    } else {
+        return await response.json();
+    }
+}
+
+// Function to log out by clearing JWT
+function logout() {
+    localStorage.removeItem('jwt');
+    document.getElementById('login-section').style.display = 'block';
+    document.getElementById('app-content').style.display = 'none';
+    alert('Logged out successfully');
+}
+
+// Function to check if user is authenticated
+function isAuthenticated() {
+    return localStorage.getItem('jwt') !== null;
+}
+
+// Event listener for login form submission
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    login(username, password);
+});
+
+// On page load, check if the user is authenticated
+window.addEventListener('load', () => {
+    if (isAuthenticated()) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+    } else {
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('app-content').style.display = 'none';
+    }
+});
 
 function validateCredentials(event) {
     event.preventDefault();
