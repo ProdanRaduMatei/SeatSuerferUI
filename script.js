@@ -107,16 +107,27 @@ function updateButtonSelection(buttonClass, value) {
     });
 }
 
+let seatMatrix = new Array(24).fill(0).map(() => new Array(24).fill(0));
+
 async function loadSeatingArrangement() {
     if (!selectedFloor || !selectedDay) return;
 
-    const url = `http://localhost:8080/api/seats/empty?storeyName=${selectedFloor}&date=${selectedDay}`;
+    const url = `http://localhost:8080/api/seats/all?storeyName=${selectedFloor}&date=${selectedDay}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const seatMatrix = await response.json();
+        const fetchedMatrix = await response.json();
+
+        // Update the existing seatMatrix with the fetched data
+        for (let i = 0; i < fetchedMatrix.length; i++) {
+            for (let j = 0; j < fetchedMatrix[i].length; j++) {
+                if (fetchedMatrix[i][j] !== 0) {
+                    seatMatrix[i][j] = fetchedMatrix[i][j];
+                }
+            }
+        }
 
         // Save the matrix in a response.json file
         saveMatrixToFile(seatMatrix);
@@ -140,33 +151,37 @@ function saveMatrixToFile(matrix) {
 
 function getToday() {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to 00:00:00
     const options = { weekday: 'long' };
     return today.toLocaleDateString('en-US', options);
 }
 
 function getDateForDay(day) {
     const today = new Date();
-    const todayDayIndex = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+    today.setUTCHours(0, 0, 0, 0); // Set time to 00:00:00 UTC
+    const todayDayIndex = today.getUTCDay(); // 0 (Sunday) to 6 (Saturday)
     const targetDayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(day);
+
 
     let daysToAdd = targetDayIndex - todayDayIndex;
     if (daysToAdd < 0) {
         if (daysToAdd === -1)
-            daysToAdd = 6;
+            daysToAdd = 7;
         if (daysToAdd === -2)
-            daysToAdd = 5;
+            daysToAdd = 6;
         if (daysToAdd === -3)
-            daysToAdd = 4;
+            daysToAdd = 5;
         if (daysToAdd === -4)
-            daysToAdd = 3;
+            daysToAdd = 4;
         if (daysToAdd === -5)
-            daysToAdd = 2;
+            daysToAdd = 3;
         if (daysToAdd === -6)
-            daysToAdd = 1;
+            daysToAdd = 2;
     }
 
     const targetDate = new Date(today);
-    targetDate.setDate(today.getDate() + daysToAdd);
+    targetDate.setUTCDate(today.getUTCDate() + daysToAdd);
+    targetDate.setUTCHours(0, 0, 0, 0); // Ensure time is 00:00:00 UTC
     return targetDate.toISOString().split('.')[0] + 'Z'; // Return date in YYYY-MM-DDTHH:MM:SSZ format
 }
 
