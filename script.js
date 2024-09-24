@@ -133,15 +133,9 @@ async function loadSeatingArrangement() {
 }
 
 function saveMatrixToFile(matrix) {
-    const fs = require('fs');
-    const filePath = 'response.json';
-    fs.writeFile(filePath, JSON.stringify(matrix, null, 2), (err) => {
-        if (err) {
-            console.error('Error saving the matrix to file:', err);
-        } else {
-            console.log('Matrix saved to response.json');
-        }
-    });
+    const json = JSON.stringify(matrix, null, 2);
+    console.log(json);
+    // You can handle the JSON data here as needed
 }
 
 function getToday() {
@@ -176,9 +170,6 @@ function getDateForDay(day) {
     return targetDate.toISOString().split('.')[0] + 'Z'; // Return date in YYYY-MM-DDTHH:MM:SSZ format
 }
 
-console.log(getToday()); // Outputs the current day
-console.log(getDateForDay('Wednesday')); // Outputs the date for the next Wednesday
-
 async function fetchEmptySeats(selectedFloor, selectedDay) {
     const url = `/api/seats/empty?storeyName=${selectedFloor}&date=${selectedDay}`;
     try {
@@ -191,14 +182,13 @@ async function fetchEmptySeats(selectedFloor, selectedDay) {
 }
 
 async function fetchBookedSeats(selectedFloor, selectedDay) {
-    const url = `/api/seats/booked`;
+    const url = `/api/seats/booked?storeyName=${selectedFloor}&date=${selectedDay}`;
     try {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ storeyName: selectedFloor, date: selectedDay })
+            }
         });
         const data = await response.json();
         console.log(data);
